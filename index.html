@@ -407,7 +407,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-9 13v-8a2 2 0 01-2-2v-2a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2v8m-12-8h18" />
             </svg>
-            <a href="mailto:o5k4r_solutions_eduportal@opoczta.pl" class="text-blue-600 hover:underline font-medium">o5k4r_solutions_eduportal@opoczta.pl</a>
+            <a href="mailto:kontakt@eduportal.pl" class="text-blue-600 hover:underline font-medium">o5k4r_solutions_eduportal@opoczta.pl</a>
         </div>
     </section>
 
@@ -510,11 +510,11 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                     <div class="dashboard-card">
                         <h3 class="text-xl font-bold text-gray-800 mb-2">Twoja placówka</h3>
-                        <p class="text-sm text-gray-600">Nie masz obecnie przypisanej placówki</p>
+                        <p class="text-sm text-gray-600" id="teacher-institution">Nie masz obecnie przypisanej placówki</p>
                     </div>
                     <div class="dashboard-card">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">Statystyki</h3>
-                        <p class="text-sm text-gray-600">Brak danych statystycznych. Wkrótce będzie to dostępne.</p>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Nauczane przedmioty</h3>
+                        <p class="text-sm text-gray-600" id="teacher-subjects">Brak danych</p>
                     </div>
                 </div>
                 <div class="dashboard-card mt-8 p-6">
@@ -598,6 +598,8 @@
             const teacherPanelSection = document.getElementById('teacherPanel');
             const welcomeMessage = document.getElementById('welcome-message');
             const teacherNameSpan = document.getElementById('teacher-name');
+            const teacherInstitutionSpan = document.getElementById('teacher-institution');
+            const teacherSubjectsSpan = document.getElementById('teacher-subjects');
             const logoutButton = document.getElementById('logout-button');
             
             const tabLinks = document.querySelectorAll('.tab-link');
@@ -621,7 +623,7 @@
             // International holidays and events data
             const internationalHolidays = {
                 12: "Spotkanie z dyrektorem",
-                19: "Dzień Patrona",
+                19: "Dzień Nauczyciela",
                 25: "Szkolenie z nowych technologii",
                 2: "Dzień Flagii Rzeczypospolitej Polskiej",
                 14: "Międzynarodowy Dzień Liczby Pi ($\pi$)",
@@ -629,7 +631,7 @@
             };
 
             // Sample educational files data
-            const educationalFiles = [
+        const educationalFiles = [
                 {
                     title: "E8 QUO VADIS",
                     author: "Agata Egrzab",
@@ -644,53 +646,21 @@
                 }
             ];
 
-            // Global variable to store teacher data
-            let teachersData = [];
+            // Teacher data with hashed passwords
+            const teachersData = [
+                { name: "Anna Nowak", institution: "Uniwersytet Warszawski", subjects: "Fizyka", email: "anna.nowak@uw.edu.pl", password: "e6702e5b9557b561c47019808a946e330a5ecb68427f7112040b2a370e0a531e" },
+                { name: "Jan Kowalski", institution: "Liceum Ogólnokształce nr 3", subjects: "Matematyka", email: "jan.kowalski@lo3.edu.pl", password: "4e7c756d10c85c29015822f6d0f507b98d2d6396e9527e021a8d506d87179040" },
+                { name: "Adam Kowalski", institution: "Szkoła Podstawowa nr 5", subjects: "Biologia", email: "adam.kowalski@sp5.edu.pl", password: "a2d2110c4d92a106f5223c68371306b3a985d88ed7c1a84f479d0315a6b09322" },
+                { name: "Adam Kozłowski", institution: "SP 387 WARSZAWA", subjects: "Matematyka, Fizyka, Chemia, Biologia, Informatyka, Język polski, Historia, Geografia, Język angielski, Język niemiecki", email: "adam.kozlowski2612@gmail.com", password: "19559c55b6efc687f54c9a62657e4e13e007d4c22cf1b67272b15745417387ab" },
+                { name: "Julia Kępczyk", institution: "SP 387 WARSZAWA", subjects: "Matematyka, Fizyka, Chemia, Biologia, Informatyka, Język polski, Historia, Geografia, Język angielski, Język niemiecki", email: "julia.kepczyk@icloud.com", password: "e0441416e8668d904791e843b0c1ec2520697223e74889c258d20875b349a37c" },
+                { name: "Borys Kalata", institution: "SP 387 WARSZAWA", subjects: "Matematyka, Fizyka, Chemia, Biologia, Informatyka, Język polski, Historia, Geografia, Język angielski, Język niemiecki", email: "borys.kalata12@icloud.com", password: "b1122a275e0c51d6c3ec910793740263f35c24e0b0b5cf8405d4001c9b674b0c" }
+            ];
 
             // Function to hash the password using SHA-256
             const hashPassword = (password) => {
                 return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
             };
 
-            const fetchTeachers = async () => {
-                const url = 'https://raw.githubusercontent.com/o5k4rsolutions/EDUPORTAL/main/teacher_accounts.md';
-                try {
-                    const response = await fetch(url);
-                    if (!response.ok) {
-                        throw new Error(`Błąd HTTP! Status: ${response.status}`);
-                    }
-                    const text = await response.text();
-                    
-                    const lines = text.split('\n');
-                    const headerIndex = lines.findIndex(line => line.includes('| Imię i Nazwisko'));
-                    if (headerIndex === -1) {
-                        console.error('Błąd: Nie znaleziono oczekiwanego nagłówka tabeli w pliku Markdown. Sprawdź format pliku.');
-                        return [];
-                    }
-
-                    const dataLines = lines.slice(headerIndex + 2);
-                    const teachers = dataLines.map(line => {
-                        const values = line.split('|').map(v => v.trim()).filter(v => v);
-                        if (values.length === 5) {
-                            const passwordValue = values[4].replace(/\[|\]/g, '');
-                            return {
-                                name: values[0],
-                                institution: values[1],
-                                subjects: values[2],
-                                email: values[3],
-                                password: passwordValue
-                            };
-                        }
-                        return null;
-                    }).filter(t => t);
-                    
-                    return teachers;
-                } catch (error) {
-                    console.error('Błąd podczas pobierania danych:', error);
-                    return [];
-                }
-            };
-            
             const renderCalendar = () => {
                 const today = new Date();
                 const year = today.getFullYear();
@@ -784,13 +754,15 @@
                 }
             };
             
-            const loginUser = (name) => {
+            const loginUser = (user) => {
                 mainHeader.classList.add('hidden');
                 teacherHeader.classList.remove('hidden');
-                welcomeMessage.textContent = `Witaj, ${name}. Jak ci mija dzień?`;
-                teacherNameSpan.textContent = name;
+                welcomeMessage.textContent = `Witaj, ${user.name}. Jak ci mija dzień?`;
+                teacherNameSpan.textContent = user.name;
+                teacherInstitutionSpan.textContent = user.institution || "Brak danych";
+                teacherSubjectsSpan.textContent = user.subjects || "Brak danych";
                 showSection('#teacherPanel');
-                renderEducationalFiles(); // Render files after login
+                renderEducationalFiles();
             };
 
             const logoutUser = () => {
@@ -906,7 +878,7 @@
                     loginSuccess.classList.remove('hidden');
                     loginPasswordInput.value = '';
                     setTimeout(() => {
-                        loginUser(foundTeacher.name);
+                        loginUser(foundTeacher);
                     }, 2000);
                 } else {
                     loginError.classList.remove('hidden');
@@ -922,7 +894,6 @@
                 tabLinks.forEach(tab => tab.classList.remove('active-tab'));
                 tabContents.forEach(content => content.classList.add('hidden'));
                 document.getElementById('chat-section').classList.remove('hidden');
-                chatButton.classList.add('active-tab'); // This doesn't exist, will need to change logic.
                 // A better approach would be to manage this with data-attributes.
             });
 
@@ -1035,11 +1006,8 @@
                 });
             });
 
-            (async () => {
-                teachersData = await fetchTeachers();
-                startInterval();
-                renderCalendar();
-            })();
+            startInterval();
+            renderCalendar();
         });
     </script>
 
