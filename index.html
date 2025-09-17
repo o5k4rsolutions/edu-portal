@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wkrótce wracamy - EDUPORTAL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d0c1d; /* Bardzo ciemny niebiesko-fioletowy kolor, jak nocne niebo */
+            overflow: hidden; /* Zapobiega pojawieniu się pasków przewijania */
+        }
+
+        /* Statyczne gwiazdy */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: transparent;
+        }
+        .stars::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(circle at 10% 20%, #ffffff 1px, transparent 1px),
+                              radial-gradient(circle at 50% 70%, #ffffff 1px, transparent 1px),
+                              radial-gradient(circle at 80% 30%, #ffffff 1px, transparent 1px),
+                              radial-gradient(circle at 20% 50%, #ffffff 1px, transparent 1px),
+                              radial-gradient(circle at 60% 80%, #ffffff 1px, transparent 1px),
+                              radial-gradient(circle at 40% 10%, #ffffff 1px, transparent 1px),
+                              radial-gradient(circle at 90% 90%, #ffffff 1px, transparent 1px);
+            background-size: 1px 1px;
+            animation: twinkle 5s infinite;
+        }
+
+        /* Spadające gwiazdy */
+        .shooting-star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background-color: transparent;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #ffffff;
+            opacity: 0; /* Zaczynamy z ukrytym elementem */
+            animation: shoot 5s linear forwards;
+        }
+        .shooting-star::before {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            transform: rotate(-45deg);
+            background: linear-gradient(90deg, transparent, #ffffff);
+        }
+        
+        /* Księżyc */
+        .moon {
+            position: absolute;
+            top: 50px;
+            right: 50px;
+            width: 80px;
+            height: 80px;
+            background: #e6e6e6;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #e6e6e6, 0 0 30px #e6e6e6, inset 10px -10px 10px #c2c2c2;
+            z-index: 10;
+        }
+
+        /* Animacje */
+        @keyframes shoot {
+            0% {
+                transform: translate(0, 0) rotate(45deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(120vw, 120vh) rotate(45deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.8; }
+            50% { opacity: 0.2; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <!-- Kontener na statyczne gwiazdy -->
+    <div class="stars"></div>
+
+    <!-- Księżyc -->
+    <div class="moon"></div>
+
+    <div class="max-w-xl w-full bg-black bg-opacity-50 backdrop-blur-md rounded-2xl shadow-2xl p-8 sm:p-12 text-center transform transition-transform duration-500 hover:scale-105 border border-white border-opacity-10 z-10">
+        <h1 class="text-3xl sm:text-4xl font-bold text-white mb-4">Wkrótce wracamy!</h1>
+        <p class="text-gray-300 text-lg sm:text-xl mb-6">Trwają prace konserwacyjne nad naszą stroną. Będziemy dostępni już wkrótce.</p>
+        <p class="text-gray-400 text-sm sm:text-base">
+            Pozdrawiamy,
+            <br>
+            <span class="font-bold text-indigo-400">Zespół EDUPORTAL</span>
+        </p>
+    </div>
+
+    <!-- Skrypt do generowania spadających gwiazd -->
+    <script>
+        const body = document.body;
+
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.classList.add('shooting-star');
+            
+            // Ustaw losową pozycję startową
+            const startX = Math.random() * window.innerWidth;
+            const startY = Math.random() * window.innerHeight * 0.5;
+            star.style.left = `${startX}px`;
+            star.style.top = `${startY}px`;
+
+            // Dodaj losowe opóźnienie animacji
+            star.style.animationDelay = `${Math.random() * 5}s`;
+
+            body.appendChild(star);
+
+            // Usuń element po zakończeniu animacji, aby nie obciążać DOM
+            star.addEventListener('animationend', () => {
+                star.remove();
+            });
+        }
+
+        // Tworzenie nowych spadających gwiazd w pętli
+        setInterval(createShootingStar, 1000); // Co 1 sekundę tworzymy nową spadającą gwiazdę
+    </script>
+</body>
+</html>
