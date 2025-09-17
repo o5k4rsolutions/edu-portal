@@ -3,189 +3,1048 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wkrótce wracamy - EDUPORTAL</title>
+    <title>EDUPORTAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d0c1d; /* Bardzo ciemny niebiesko-fioletowy kolor, jak nocne niebo */
-            overflow: hidden; /* Zapobiega pojawieniu się pasków przewijania */
+            background-color: #F8F9FA;
         }
 
-        /* Statyczne gwiazdy */
-        .stars {
+        .gradient-button {
+            background-image: linear-gradient(135deg, #A78BFA 0%, #8B5CF6 100%);
+            transition: all 0.2s ease-in-out;
+        }
+        .gradient-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .dark-blue-button {
+            background-color: #2D3A74;
+            transition: all 0.2s ease-in-out;
+        }
+        .dark-blue-button:hover {
+            background-color: #38488D;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(45, 58, 116, 0.4);
+        }
+
+        .nav-link.active-link {
+            font-weight: 700;
+            color: #2D3A74;
+            border-bottom: 2px solid #2D3A74;
+        }
+
+        /* Styles for the carousel */
+        .carousel-slide {
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
-            background: transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            background-size: cover;
+            background-position: center;
         }
-        .stars::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 100%;
-            background-image: radial-gradient(circle at 10% 20%, #ffffff 1px, transparent 1px),
-                              radial-gradient(circle at 50% 70%, #ffffff 1px, transparent 1px),
-                              radial-gradient(circle at 80% 30%, #ffffff 1px, transparent 1px),
-                              radial-gradient(circle at 20% 50%, #ffffff 1px, transparent 1px),
-                              radial-gradient(circle at 60% 80%, #ffffff 1px, transparent 1px),
-                              radial-gradient(circle at 40% 10%, #ffffff 1px, transparent 1px),
-                              radial-gradient(circle at 90% 90%, #ffffff 1px, transparent 1px);
-            background-size: 1px 1px;
-            animation: twinkle 5s infinite;
+        .carousel-slide.active {
+            opacity: 1;
+            position: relative;
         }
 
-        /* Spadające gwiazdy */
-        .shooting-star {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background-color: transparent;
-            border-radius: 50%;
-            box-shadow: 0 0 10px #ffffff;
-            opacity: 0; /* Zaczynamy z ukrytym elementem */
-            animation: shoot 5s linear forwards;
-        }
-        .shooting-star::before {
-            content: '';
-            position: absolute;
-            width: 50px;
-            height: 2px;
-            transform: rotate(-45deg);
-            background: linear-gradient(90deg, transparent, #ffffff);
+        .slide-1 {
+            background-image: url('https://o5k4rsolutions.github.io/EDUPORTAL/files/tablica_EduPORTAL.png');
+            color: white;
         }
         
-        /* Księżyc */
-        .moon {
+        .slide-2 {
+            background-color: #E6EBF8;
+        }
+
+        .slide-3 {
+            background-color: #F8F9FA;
+        }
+
+        .carousel-arrow {
             position: absolute;
-            top: 50px;
-            right: 50px;
-            width: 80px;
-            height: 80px;
-            background: #e6e6e6;
-            border-radius: 50%;
-            box-shadow: 0 0 15px #e6e6e6, 0 0 30px #e6e6e6, inset 10px -10px 10px #c2c2c2;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 1rem;
+            border-radius: 9999px;
+            cursor: pointer;
             z-index: 10;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .carousel-arrow:hover {
+            background-color: rgba(255, 255, 255, 1);
         }
 
-        /* Animacje */
-        @keyframes shoot {
-            0% {
-                transform: translate(0, 0) rotate(45deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translate(120vw, 120vh) rotate(45deg);
-                opacity: 0;
-            }
+        #prevArrow {
+            left: 1rem;
+        }
+        #nextArrow {
+            right: 1rem;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 0.2; }
+        .carousel-dot {
+            width: 16px;
+            height: 16px;
+            background-color: rgba(45, 58, 116, 0.3);
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .carousel-dot.active {
+            background-color: #2D3A74;
+        }
+
+        /* Style for the loading screen */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s, visibility 0.5s;
+        }
+
+        #loading-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #2D3A74;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tab-link.active-tab {
+            font-weight: 700;
+            color: #2D3A74;
+            border-bottom: 2px solid #2D3A74;
+        }
+
+        /* Dashboard specific styles */
+        .dashboard-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #2D3A74;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            pointer-events: none;
+            margin-bottom: 0.5rem;
+            z-index: 20;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2D3A74 transparent transparent transparent;
+        }
+
+        .has-event:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #8B5CF6;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* Chat styles */
+        #chat-container {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 200px); /* Adjust height to fit the screen */
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #F0F4F8;
+            border: 1px solid #E2E8F0;
+        }
+
+        #chat-messages {
+            flex-grow: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-message {
+            max-width: 80%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #A78BFA;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 0;
+        }
+
+        .ai-message {
+            background-color: #E2E8F0;
+            color: #2D3A74;
+            align-self: flex-start;
+            border-bottom-left-radius: 0;
+        }
+
+        #chat-input-container {
+            padding: 1rem;
+            background-color: #fff;
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            align-items: center;
+        }
+
+        #chat-input {
+            flex-grow: 1;
+            border: 1px solid #CBD5E0;
+            border-radius: 9999px;
+            padding: 0.75rem 1.25rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        #chat-input:focus {
+            border-color: #8B5CF6;
+        }
+
+        #send-button {
+            margin-left: 1rem;
+            padding: 0.75rem;
+            border-radius: 9999px;
+            background-color: #8B5CF6;
+            color: white;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #A78BFA;
+        }
+
+        /* Educational materials styles */
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background-color: #F8FAFC;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        .file-item:hover {
+            background-color: #F0F4F8;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-title {
+            font-weight: 600;
+            color: #2D3A74;
+        }
+
+        .file-author {
+            font-size: 0.875rem;
+            color: #64748B;
         }
     </style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-4">
+<body>
 
-    <!-- Kontener na statyczne gwiazdy -->
-    <div class="stars"></div>
+    <!-- Main Header for main site -->
+    <header id="main-header" class="bg-white shadow-md py-4 px-4 md:px-12 flex flex-col md:flex-row justify-between items-center sticky top-0 z-50">
+        <!-- Logo -->
+        <a href="#home" class="text-2xl font-bold text-[#2D3A74] mb-4 md:mb-0">
+            <img src="https://o5k4rsolutions.github.io/EDUPORTAL/files/logoeduportal2.png" alt="Logo Eduportal" class="h-10 w-auto">
+        </a>
 
-    <!-- Księżyc -->
-    <div class="moon"></div>
-
-    <div class="max-w-xl w-full bg-black bg-opacity-50 backdrop-blur-md rounded-2xl shadow-2xl p-8 sm:p-12 text-center transform transition-transform duration-500 hover:scale-105 border border-white border-opacity-10 z-10">
-        <h1 class="text-3xl sm:text-4xl font-bold text-white mb-4">Wkrótce wracamy!</h1>
-        <p class="text-gray-300 text-lg sm:text-xl mb-6">Trwają prace konserwacyjne nad naszą stroną. Będziemy dostępni już wkrótce.</p>
-        <p class="text-gray-400 text-sm sm:text-base">
-            Pozdrawiamy,
-            <br>
-            <span class="font-bold text-indigo-400">Zespół EDUPORTAL</span>
-        </p>
-        
-        <button id="show-plans-btn" class="mt-8 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-full shadow-lg transition-colors duration-300 transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-900">
-            Zobacz nasze plany
-        </button>
-    </div>
-
-    <!-- Modal z planami -->
-    <div id="plans-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm z-50 hidden">
-        <div class="bg-gray-800 p-8 rounded-2xl shadow-lg border border-white border-opacity-10 max-w-md w-full relative transform transition-transform duration-300 scale-95 opacity-0">
-            <button id="close-modal-btn" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors duration-200">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-            <h2 class="text-2xl font-bold text-white mb-6">Nasze Plany</h2>
-            <ul class="list-disc list-inside text-left text-gray-300 space-y-4">
-                <li>
-                    <span class="font-bold text-white">19 września:</span> Uruchomienie EDUportalu.
-                </li>
-                <li>
-                    <span class="font-bold text-white">Początek października:</span> Dodanie funkcji generowania testów i kartkówek.
-                </li>
-                <li>
-                    <span class="font-bold text-white">Koniec grudnia:</span> Możliwość tworzenia klas, zarządzania uczniami i innymi funkcjami.
-                </li>
+        <!-- Navigation -->
+        <nav class="flex-grow flex justify-center">
+            <ul class="flex flex-wrap justify-center space-x-2 md:space-x-8 text-base font-medium text-gray-800">
+                <li><a href="#home" class="nav-link hover:text-[#5B487A] transition-colors py-2 md:py-0 px-2 active-link">Strona Główna</a></li>
+                <li><a href="#about" class="nav-link hover:text-[#5B487A] transition-colors py-2 md:py-0 px-2">O nas</a></li>
+                <li><a href="#contact" class="nav-link hover:text-[#5B487A] transition-colors py-2 md:py-0 px-2">Kontakt</a></li>
             </ul>
+        </nav>
+
+        <!-- Action buttons -->
+        <div class="flex items-center space-x-4 mt-4 md:mt-0">
+            <a href="#login" class="nav-link dark-blue-button text-white font-semibold py-2 px-6 rounded-full shadow-lg text-sm">Zaloguj się</a>
         </div>
+    </header>
+
+    <!-- Header for teacher panel -->
+    <header id="teacher-header" class="bg-white shadow-md py-4 px-4 md:px-12 flex items-center justify-between sticky top-0 z-50 hidden">
+        <div class="flex items-center space-x-4">
+            <a href="#teacherPanel" class="text-2xl font-bold text-[#2D3A74]">
+                <img src="https://o5k4rsolutions.github.io/EDUPORTAL/files/logoeduportal2.png" alt="Logo Eduportal" class="h-10 w-auto">
+            </a>
+            <p id="welcome-message" class="text-xl font-medium text-gray-700"></p>
+        </div>
+        <button id="logout-button" class="dark-blue-button text-white font-semibold py-2 px-6 rounded-full shadow-lg text-sm">Wyloguj się</button>
+    </header>
+
+    <!-- Main section - Carousel -->
+    <section id="home" class="relative w-full overflow-hidden h-[50vh] md:h-[65vh] flex items-center justify-center">
+        <div id="carousel" class="w-full h-full relative">
+            <!-- Slide 1 -->
+            <div class="carousel-slide active flex flex-col items-center justify-center text-center bg-blue-50 slide-1">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight">Witamy w EDUPORTAL!</h1>
+                <p class="mt-4 text-lg sm:text-xl lg:text-2xl text-white">Twoja brama do wiedzy.</p>
+            </div>
+            <!-- Slide 2 -->
+            <div class="carousel-slide flex flex-col items-center justify-center text-center bg-pink-50 slide-2">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#2D3A74] leading-tight">Zarejestruj się do EDUPORTAL!</h1>
+                <p class="mt-4 text-lg sm:text-xl lg:text-2xl text-gray-600">Dołącz do naszej rosnącej społeczności.</p>
+                <a href="#register" class="mt-6 gradient-button text-white font-semibold py-3 px-8 rounded-full shadow-lg inline-block nav-link text-lg">Zarejestruj się</a>
+            </div>
+            <!-- Slide 3 -->
+            <div class="carousel-slide flex flex-col items-center justify-center text-center bg-purple-50 slide-3">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#2D3A74] leading-tight">Odkryj nasze kursy!</h1>
+                <p class="mt-4 text-lg sm:text-xl lg:text-2xl text-gray-600">Rozwijaj swoje pasje i umiejętności.</p>
+                <a href="#" class="mt-6 dark-blue-button text-white font-semibold py-3 px-8 rounded-full shadow-lg inline-block text-lg">Przeglądaj</a>
+            </div>
+        </div>
+
+        <!-- Navigation arrows -->
+        <div id="prevArrow" class="carousel-arrow">
+            <svg class="w-12 h-12 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </div>
+        <div id="nextArrow" class="carousel-arrow">
+            <svg class="w-12 h-12 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </div>
+
+        <!-- Indicator dots -->
+        <div id="dots-container" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+            <span class="carousel-dot active"></span>
+            <span class="carousel-dot"></span>
+            <span class="carousel-dot"></span>
+        </div>
+    </section>
+
+    <!-- About Us section -->
+    <section id="about" class="p-12 md:p-16 bg-gray-50 hidden">
+        <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">O nas</h2>
+        <p class="text-base text-gray-600 leading-relaxed text-center max-w-3xl mx-auto">EDUPORTAL powstał z pasji do dzielenia się wiedzą. Wierzymy, że każdy, niezależnie od wieku czy doświadczenia, powinien mieć dostęp do wysokiej jakości materiałów edukacyjnych. Nasz zespół składa się z ekspertów w swoich dziedzinach, którzy tworzą kursy i treści dostosowane do współczesnych potrzeb. Naszą misją jest inspirowanie i umożliwianie ciągłego rozwoju osobistego i zawodowego. Stawiamy na praktyczną wiedzę, interaktywne ćwiczenia i wsparcie społeczności, aby nauka była jak najbardziej efektywna.</p>
+    </section>
+
+    <!-- Contact section -->
+    <section id="contact" class="p-12 md:p-16 bg-white hidden">
+        <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">Kontakt</h2>
+        <p class="text-base text-gray-600 leading-relaxed text-center mb-8">Masz pytania lub sugestie? Chętnie pomożemy!</p>
+        <div class="flex justify-center items-center space-x-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-9 13v-8a2 2 0 01-2-2v-2a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2v8m-12-8h18" />
+            </svg>
+            <a href="mailto:o5k4r_solutions_eduportal@opoczta.pl" class="text-blue-600 hover:underline font-medium">o5k4r_solutions_eduportal@opoczta.pl</a>
+        </div>
+    </section>
+
+    <!-- Login section -->
+    <section id="login" class="p-12 md:p-16 bg-gray-50 hidden">
+        <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">Zaloguj się</h2>
+        <p class="text-base text-gray-600 leading-relaxed text-center mb-8">Dostęp do wszystkich kursów i Twoich postępów. Jeśli nie masz konta, <a href="#register" class="text-blue-600 hover:underline font-medium nav-link">zarejestruj się</a>.</p>
+        <form id="loginForm" class="max-w-xl mx-auto space-y-4">
+            <div id="login-error" class="hidden text-center text-red-600 font-bold bg-red-100 p-3 rounded-lg text-sm">
+                Nieprawidłowy adres e-mail lub hasło. Spróbuj ponownie.
+            </div>
+            <div>
+                <label for="email" class="block text-gray-700 font-bold mb-1 text-base">E-mail</label>
+                <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base" placeholder="Twój adres e-mail">
+            </div>
+            <div>
+                <label for="password" class="block text-gray-700 font-bold mb-1 text-base">Hasło</label>
+                <input type="password" id="password" name="password" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base" placeholder="Twoje hasło">
+            </div>
+            <button type="submit" class="w-full dark-blue-button text-white font-bold py-3 rounded-lg shadow-md text-base">Zaloguj się</button>
+            <p class="text-center text-sm text-gray-600">Nie masz konta? <a href="#register" class="text-blue-600 hover:underline font-medium nav-link">Zarejestruj się</a></p>
+        </form>
+        <div id="login-success" class="hidden text-center mt-6 text-green-600 font-bold text-base">
+            Zalogowano pomyślnie! Przenoszenie do Twojego panelu...
+        </div>
+    </section>
+
+    <!-- Registration section -->
+    <section id="register" class="p-12 md:p-16 bg-white hidden">
+        <div id="register-form-container">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-6">Zarejestruj się</h2>
+            <p class="text-base text-gray-600 leading-relaxed text-center mb-8">Wypełnij formularz, aby dołączyć do naszej społeczności.</p>
+            
+            <form id="registrationForm" class="max-w-xl mx-auto space-y-4">
+                <!-- Registration error message -->
+                <div id="register-error" class="hidden text-center text-red-600 font-bold bg-red-100 p-3 rounded-lg text-sm">
+                    Wystąpił błąd podczas rejestracji. Spróbuj ponownie.
+                </div>
+                <div>
+                    <label for="fullName" class="block text-gray-700 font-bold mb-1 text-base">Imię i nazwisko</label>
+                    <input type="text" id="fullName" name="Imię i nazwisko" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base" placeholder="np. Jan Kowalski" required>
+                </div>
+                <div>
+                    <label for="subjects" class="block text-gray-700 font-bold mb-1 text-base">Nauczane przedmioty</label>
+                    <!-- Using select with multiple attribute to select multiple subjects -->
+                    <select id="subjects" name="Nauczane przedmioty[]" multiple class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base" size="5">
+                        <option value="Matematyka">Matematyka</option>
+                        <option value="Fizyka">Fizyka</option>
+                        <option value="Chemia">Chemia</option>
+                        <option value="Biologia">Biologia</option>
+                        <option value="Informatyka">Informatyka</option>
+                        <option value="Język polski">Język polski</option>
+                        <option value="Historia">Historia</option>
+                        <option value="Geografia">Geografia</option>
+                        <option value="Język angielski">Język angielski</option>
+                        <option value="Język niemiecki">Język niemiecki</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="registerEmail" class="block text-gray-700 font-bold mb-1 text-base">E-mail</label>
+                    <input type="email" id="registerEmail" name="E-mail" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base" placeholder="Twój adres e-mail" required>
+                </div>
+                <div>
+                    <label for="phoneNumber" class="block text-gray-700 font-bold mb-1 text-base">Numer telefonu</label>
+                    <!-- Phone number validation in HTML -->
+                    <input type="tel" id="phoneNumber" name="Numer telefonu" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-base" pattern="^\+48\s\d{9}$" title="Numer telefonu musi zawierać 9 cyfr po +48" required>
+                </div>
+                <button type="submit" class="w-full gradient-button text-white font-bold py-3 rounded-lg shadow-md text-base">Gotowe</button>
+            </form>
+            <div id="success-message" class="hidden text-center mt-6">
+                <h3 class="text-2xl font-bold text-green-600 mb-2">Dziękujemy za rejestrację!</h3>
+                <p class="text-base text-gray-700 leading-relaxed">Twoje konto zostało wgrane do bazy. Zespół Wsparcia do 14 dni roboczych zweryfikuje twój profil i utworzy ci konto. Następnie na twojego maila prześlą się wszystkie potrzebne ci rzeczy do logowania.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teacher Panel Section -->
+    <section id="teacherPanel" class="p-6 md:p-12 bg-gray-100 hidden">
+        <div class="max-w-7xl mx-auto">
+            <!-- Header for Teacher Panel -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
+                <div class="mb-4 sm:mb-0">
+                    <h2 class="text-4xl font-extrabold text-[#2D3A74]">Dzień dobry, <span id="teacher-name"></span></h2>
+                    <p class="mt-2 text-gray-600">Oto Twój pulpit. Znajdziesz tutaj najważniejsze elementy Twojej platformy.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
+                    <button id="test-generator-button" class="w-full sm:w-auto dark-blue-button text-white font-semibold py-3 px-6 rounded-full shadow-lg text-sm">Wygeneruj sprawdzian</button>
+                    <button id="chat-button" class="w-full sm:w-auto dark-blue-button text-white font-semibold py-3 px-6 rounded-full shadow-lg text-sm">Porozmawiaj z AI</button>
+                </div>
+            </div>
+
+            <!-- Tabs for teacher content -->
+            <div class="flex justify-center space-x-4 border-b border-gray-300 mb-6">
+                <button class="tab-link active-tab py-2 px-4 transition-colors duration-200" data-tab="dashboard-content">Dashboard</button>
+                <button class="tab-link py-2 px-4 transition-colors duration-200" data-tab="educational-materials-content">Materiały edukacyjne</button>
+            </div>
+
+            <!-- Tab Content: Dashboard -->
+            <div id="dashboard-content" class="tab-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <div class="dashboard-card">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Twoja placówka</h3>
+                        <p class="text-sm text-gray-600">Nie masz obecnie przypisanej placówki</p>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">Statystyki</h3>
+                        <p class="text-sm text-gray-600">Brak danych statystycznych. Wkrótce będzie to dostępne.</p>
+                    </div>
+                </div>
+                <div class="dashboard-card mt-8 p-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">Kalendarz</h3>
+                    <div class="grid grid-cols-7 gap-2 text-center text-sm font-semibold text-gray-600 mb-2">
+                        <span>Pon</span>
+                        <span>Wt</span>
+                        <span>Śr</span>
+                        <span>Czw</span>
+                        <span>Pt</span>
+                        <span>Sob</span>
+                        <span>Ndz</span>
+                    </div>
+                    <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center text-gray-800"></div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Educational Materials -->
+            <div id="educational-materials-content" class="tab-content hidden">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4">Materiały edukacyjne</h3>
+                <div id="educational-files-list" class="space-y-4">
+                    <!-- Files will be dynamically generated here -->
+                </div>
+            </div>
+            
+            <!-- Chatbot section -->
+            <div id="chat-section" class="tab-content hidden p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-4 text-center">Porozmawiaj z AI</h3>
+                <div id="chat-container">
+                    <div id="chat-messages">
+                        <!-- Chat messages will be dynamically added here -->
+                        <div class="ai-message chat-message">Witaj! Jestem tutaj, aby Ci pomóc. O co chciałbyś mnie zapytać?</div>
+                    </div>
+                    <div id="chat-input-container">
+                        <input type="text" id="chat-input" placeholder="Wpisz swoją wiadomość..." />
+                        <button id="send-button">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#253266] text-white py-8 mt-12">
+        <div class="max-w-6xl mx-auto px-4 text-center">
+            <img src="https://o5k4rsolutions.github.io/EDUPORTAL/files/logoeduportal2.png" alt="Logo Eduportal" class="h-10 w-auto mx-auto mb-2">
+            <p class="text-base font-semibold">Darmowa platforma dla nauczycieli.</p>
+            <p class="mt-2 text-sm text-gray-300">Tworzymy narzędzia i zasoby, które ułatwiają proces nauczania.</p>
+        </div>
+    </footer>
+
+    <!-- Loading screen -->
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+        <p id="loading-text" class="mt-4 text-base font-semibold text-[#2D3A74]">Trwa ładowanie...</p>
     </div>
     
-    <!-- Skrypt do generowania spadających gwiazd -->
     <script>
-        const body = document.body;
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinks = document.querySelectorAll('a.nav-link');
+            const sections = document.querySelectorAll('section');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingText = document.getElementById('loading-text');
 
-        function createShootingStar() {
-            const star = document.createElement('div');
-            star.classList.add('shooting-star');
+            const registrationForm = document.getElementById('registrationForm');
+            const registrationFormContainer = document.getElementById('register-form-container');
+            const successMessage = document.getElementById('success-message');
+            const registrationError = document.getElementById('register-error');
+            const phoneNumberInput = document.getElementById('phoneNumber');
+
+            const loginForm = document.getElementById('loginForm');
+            const loginEmailInput = document.getElementById('email');
+            const loginPasswordInput = document.getElementById('password');
+            const loginError = document.getElementById('login-error');
+            const loginSuccess = document.getElementById('login-success');
             
-            // Ustaw losową pozycję startową
-            const startX = Math.random() * window.innerWidth;
-            const startY = Math.random() * window.innerHeight * 0.5;
-            star.style.left = `${startX}px`;
-            star.style.top = `${startY}px`;
+            const mainHeader = document.getElementById('main-header');
+            const teacherHeader = document.getElementById('teacher-header');
+            const teacherPanelSection = document.getElementById('teacherPanel');
+            const welcomeMessage = document.getElementById('welcome-message');
+            const teacherNameSpan = document.getElementById('teacher-name');
+            const logoutButton = document.getElementById('logout-button');
+            
+            const tabLinks = document.querySelectorAll('.tab-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Calendar specific elements
+            const calendarGrid = document.getElementById('calendar-grid');
 
-            // Dodaj losowe opóźnienie animacji
-            star.style.animationDelay = `${Math.random() * 5}s`;
+            // Chat elements
+            const chatButton = document.getElementById('chat-button');
+            const chatMessages = document.getElementById('chat-messages');
+            const chatInput = document.getElementById('chat-input');
+            const sendButton = document.getElementById('send-button');
 
-            body.appendChild(star);
+            // Test generator button
+            const testGeneratorButton = document.getElementById('test-generator-button');
 
-            // Usuń element po zakończeniu animacji, aby nie obciążać DOM
-            star.addEventListener('animationend', () => {
-                star.remove();
+            // Educational materials list
+            const educationalFilesList = document.getElementById('educational-files-list');
+
+            // International holidays and events data
+            const internationalHolidays = {
+                12: "Spotkanie z dyrektorem",
+                19: "Dzień Patrona",
+                25: "Szkolenie z nowych technologii",
+                2: "Dzień Flagii Rzeczypospolitej Polskiej",
+                14: "Międzynarodowy Dzień Liczby Pi ($\pi$)",
+                21: "Międzynarodowy Dzień Języka Ojczystego"
+            };
+
+            // Sample educational files data
+            const educationalFiles = [
+                {
+                    title: "E8 QUO VADIS",
+                    author: "Agata Egrzab",
+                    url: "" // Placeholder URL
+                },
+                {
+                    title: "Zadania z matematyki - Geometria",
+                    author: "Anna Nowak",
+                    url: "https://www.example.com/zadania-matematyka.docx" // Placeholder URL
+                },
+                {
+                    title: "Prezentacja PowerPoint - Historia Polski",
+                    author: "Tomasz Wójcik",
+                    url: "https://www.example.com/prezentacja-historia.pptx" // Placeholder URL
+                }
+            ];
+
+            // Global variable to store teacher data
+            let teachersData = [];
+
+            // Function to hash the password using SHA-256
+            const hashPassword = (password) => {
+                return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+            };
+
+            const fetchTeachers = async () => {
+                const url = 'https://raw.githubusercontent.com/o5k4rsolutions/EDUPORTAL/main/teacher_accounts.md';
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) {
+                        throw new Error(`Błąd HTTP! Status: ${response.status}`);
+                    }
+                    const text = await response.text();
+                    
+                    const lines = text.split('\n');
+                    const headerIndex = lines.findIndex(line => line.includes('| Imię i Nazwisko'));
+                    if (headerIndex === -1) {
+                        console.error('Błąd: Nie znaleziono oczekiwanego nagłówka tabeli w pliku Markdown. Sprawdź format pliku.');
+                        return [];
+                    }
+
+                    const dataLines = lines.slice(headerIndex + 2);
+                    const teachers = dataLines.map(line => {
+                        const values = line.split('|').map(v => v.trim()).filter(v => v);
+                        if (values.length === 5) {
+                            const passwordValue = values[4].replace(/\[|\]/g, '');
+                            return {
+                                name: values[0],
+                                institution: values[1],
+                                subjects: values[2],
+                                email: values[3],
+                                password: passwordValue
+                            };
+                        }
+                        return null;
+                    }).filter(t => t);
+                    
+                    return teachers;
+                } catch (error) {
+                    console.error('Błąd podczas pobierania danych:', error);
+                    return [];
+                }
+            };
+            
+            const renderCalendar = () => {
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = today.getMonth();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                
+                calendarGrid.innerHTML = '';
+
+                for (let i = 1; i < firstDayOfMonth; i++) {
+                    const emptyDay = document.createElement('span');
+                    emptyDay.classList.add('p-2');
+                    calendarGrid.appendChild(emptyDay);
+                }
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const dayElement = document.createElement('span');
+                    dayElement.classList.add('p-2', 'relative', 'rounded-lg', 'transition-colors', 'duration-200', 'cursor-pointer');
+                    
+                    const eventText = internationalHolidays[day];
+                    if (eventText) {
+                        dayElement.classList.add('has-event', 'bg-blue-100');
+                        dayElement.innerHTML = `
+                            ${day}
+                            <div class="event-dot"></div>
+                            <div class="tooltip">${eventText}</div>
+                        `;
+                    } else {
+                        dayElement.textContent = day;
+                        dayElement.classList.add('hover:bg-gray-200');
+                    }
+                    
+                    if (day === today.getDate()) {
+                        dayElement.classList.add('bg-blue-500', 'text-white', 'hover:bg-blue-600');
+                    }
+
+                    calendarGrid.appendChild(dayElement);
+                }
+            };
+
+            const renderEducationalFiles = () => {
+                educationalFilesList.innerHTML = '';
+                educationalFiles.forEach(file => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <div class="file-info">
+                            <span class="file-title">${file.title}</span>
+                            <span class="file-author">Autor: ${file.author}</span>
+                        </div>
+                        <a href="${file.url}" target="_blank" download class="dark-blue-button text-white font-semibold py-2 px-4 rounded-full text-sm">Pobierz</a>
+                    `;
+                    educationalFilesList.appendChild(fileItem);
+                });
+            };
+
+            const showSection = (targetId) => {
+                sections.forEach(section => {
+                    section.style.display = 'none';
+                });
+                const targetSection = document.querySelector(targetId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                }
+            };
+
+            const showLoadingAnimation = (targetId, message, callback) => {
+                loadingOverlay.classList.remove('hidden');
+                loadingOverlay.classList.add('visible');
+                loadingText.textContent = message;
+
+                setTimeout(() => {
+                    loadingText.textContent = "Miłego korzystania z EDUPORTAL!";
+                    setTimeout(() => {
+                        loadingOverlay.classList.remove('visible');
+                        loadingOverlay.classList.add('hidden');
+                        showSection(targetId);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        if (callback) callback();
+                    }, 500);
+                }, 3000);
+            };
+
+            const updateNavActiveState = (targetId) => {
+                navLinks.forEach(link => {
+                    link.classList.remove('active-link');
+                });
+                const activeLink = document.querySelector(`a.nav-link[href="${targetId}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active-link');
+                }
+            };
+            
+            const loginUser = (name) => {
+                mainHeader.classList.add('hidden');
+                teacherHeader.classList.remove('hidden');
+                welcomeMessage.textContent = `Witaj, ${name}. Jak ci mija dzień?`;
+                teacherNameSpan.textContent = name;
+                showSection('#teacherPanel');
+                renderEducationalFiles(); // Render files after login
+            };
+
+            const logoutUser = () => {
+                mainHeader.classList.remove('hidden');
+                teacherHeader.classList.add('hidden');
+                showSection('#home');
+                updateNavActiveState('#home');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const targetId = event.target.getAttribute('href');
+                    
+                    if (targetId === '#login' || targetId === '#register') {
+                        showLoadingAnimation(targetId, "Trwa ładowanie formularza...");
+                    } else {
+                        showSection(targetId);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    updateNavActiveState(targetId);
+                });
             });
-        }
 
-        // Tworzenie nowych spadających gwiazd w pętli
-        setInterval(createShootingStar, 1000); // Co 1 sekundę tworzymy nową spadającą gwiazdę
+            tabLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const targetTab = event.target.getAttribute('data-tab');
 
-        // Logika modala
-        const showPlansBtn = document.getElementById('show-plans-btn');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const plansModal = document.getElementById('plans-modal');
-        const modalContent = plansModal.querySelector('div');
+                    tabLinks.forEach(tab => tab.classList.remove('active-tab'));
+                    event.target.classList.add('active-tab');
 
-        showPlansBtn.addEventListener('click', () => {
-            plansModal.classList.remove('hidden');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95', 'opacity-0');
-                modalContent.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        });
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    document.getElementById(targetTab).classList.remove('hidden');
+                });
+            });
 
-        closeModalBtn.addEventListener('click', () => {
-            modalContent.classList.remove('scale-100', 'opacity-100');
-            modalContent.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                plansModal.classList.add('hidden');
-            }, 300); // Czas trwania animacji
+            phoneNumberInput.value = "+48 ";
+            phoneNumberInput.addEventListener('input', (event) => {
+                if (!event.target.value.startsWith("+48 ")) {
+                    event.target.value = "+48 ";
+                }
+                if (event.target.value.length > 13) {
+                    event.target.value = event.target.value.slice(0, 13);
+                }
+            });
+
+            registrationForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                registrationError.classList.add('hidden');
+                const formspreeUrl = 'https://formspree.io/f/xpwjnzpl';
+                const formData = new FormData(registrationForm);
+                const data = {};
+                for (let [key, value] of formData.entries()) {
+                    if (key.endsWith('[]')) {
+                        const name = key.slice(0, -2);
+                        if (!data[name]) {
+                            data[name] = [];
+                        }
+                        data[name].push(value);
+                    } else {
+                        data[key] = value;
+                    }
+                }
+                const phoneValue = phoneNumberInput.value.replace(/\s/g, '');
+                if (phoneValue.length !== 12 || !phoneValue.startsWith("+48")) {
+                    registrationError.textContent = 'Proszę podać poprawny numer telefonu (9 cyfr po +48).';
+                    registrationError.classList.remove('hidden');
+                    return;
+                }
+                registrationFormContainer.style.display = 'none';
+                showLoadingAnimation('#register', "Trwa wysyłanie formularza...");
+                try {
+                    const response = await fetch(formspreeUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (response.ok) {
+                        registrationForm.style.display = 'none';
+                        successMessage.classList.remove('hidden');
+                    } else {
+                        console.error('Form submission error.');
+                        successMessage.classList.add('hidden');
+                        registrationForm.style.display = 'block';
+                        registrationError.textContent = 'Wystąpił błąd podczas wysyłania formularza. Spróbuj ponownie.';
+                        registrationError.classList.remove('hidden');
+                    }
+                } catch (error) {
+                    console.error('Network error occurred:', error);
+                    successMessage.classList.add('hidden');
+                    registrationForm.style.display = 'block';
+                    registrationError.textContent = 'Wystąpił błąd sieci. Sprawdź połączenie i spróbuj ponownie.';
+                    registrationError.classList.remove('hidden');
+                }
+            });
+
+            loginForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const email = loginEmailInput.value;
+                const password = loginPasswordInput.value;
+                const hashedPassword = hashPassword(password);
+                const foundTeacher = teachersData.find(teacher => 
+                    teacher.email.toLowerCase() === email.toLowerCase() && 
+                    teacher.password === hashedPassword
+                );
+                if (foundTeacher) {
+                    loginError.classList.add('hidden');
+                    loginSuccess.classList.remove('hidden');
+                    loginPasswordInput.value = '';
+                    setTimeout(() => {
+                        loginUser(foundTeacher.name);
+                    }, 2000);
+                } else {
+                    loginError.classList.remove('hidden');
+                    loginSuccess.classList.add('hidden');
+                    loginPasswordInput.value = '';
+                }
+            });
+            
+            logoutButton.addEventListener('click', logoutUser);
+
+            // Chatbot functionality
+            chatButton.addEventListener('click', () => {
+                tabLinks.forEach(tab => tab.classList.remove('active-tab'));
+                tabContents.forEach(content => content.classList.add('hidden'));
+                document.getElementById('chat-section').classList.remove('hidden');
+                chatButton.classList.add('active-tab'); // This doesn't exist, will need to change logic.
+                // A better approach would be to manage this with data-attributes.
+            });
+
+            sendButton.addEventListener('click', async () => {
+                const userMessageText = chatInput.value.trim();
+                if (userMessageText === '') return;
+
+                // Display user message
+                const userMessageDiv = document.createElement('div');
+                userMessageDiv.className = 'chat-message user-message';
+                userMessageDiv.textContent = userMessageText;
+                chatMessages.appendChild(userMessageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                chatInput.value = '';
+                chatInput.disabled = true;
+                sendButton.disabled = true;
+
+                // Display loading message
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'chat-message ai-message';
+                loadingDiv.innerHTML = 'Piszę... <span class="spinner w-4 h-4 inline-block"></span>';
+                chatMessages.appendChild(loadingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                try {
+                    // API Call will be added by the user here
+                    const response = "Przepraszam, ta funkcja jest w trakcie rozwoju. Proszę spróbować ponownie później."; // Placeholder response
+                    
+                    // Remove loading message
+                    chatMessages.removeChild(loadingDiv);
+
+                    // Display AI response
+                    const aiMessageDiv = document.createElement('div');
+                    aiMessageDiv.className = 'chat-message ai-message';
+                    aiMessageDiv.textContent = response;
+                    chatMessages.appendChild(aiMessageDiv);
+
+                } catch (error) {
+                    console.error('Error fetching AI response:', error);
+                    chatMessages.removeChild(loadingDiv);
+                    const errorDiv = document.createElement('div');
+                    errorDiv.className = 'chat-message ai-message';
+                    errorDiv.textContent = 'Przepraszam, wystąpił błąd. Spróbuj ponownie.';
+                    chatMessages.appendChild(errorDiv);
+                } finally {
+                    chatInput.disabled = false;
+                    sendButton.disabled = false;
+                    chatInput.focus();
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            });
+
+            chatInput.addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    sendButton.click();
+                }
+            });
+            
+            // Test Generator Button logic
+            testGeneratorButton.addEventListener('click', () => {
+                alert("Generator testów będzie dostępny po 10 października. Dziękujemy za cierpliwość!");
+            });
+
+            showSection('#home');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            const slides = document.querySelectorAll('.carousel-slide');
+            const dots = document.querySelectorAll('.carousel-dot');
+            const prevArrow = document.getElementById('prevArrow');
+            const nextArrow = document.getElementById('nextArrow');
+            let currentSlide = 0;
+            let slideInterval;
+
+            const updateCarousel = (index) => {
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                    dots[i].classList.remove('active');
+                });
+                slides[index].classList.add('active');
+                dots[index].classList.add('active');
+            };
+
+            const nextSlide = () => {
+                currentSlide = (currentSlide + 1) % slides.length;
+                updateCarousel(currentSlide);
+            };
+
+            const startInterval = () => {
+                clearInterval(slideInterval);
+                slideInterval = setInterval(nextSlide, 5000);
+            };
+
+            prevArrow.addEventListener('click', () => {
+                currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+                updateCarousel(currentSlide);
+                startInterval();
+            });
+
+            nextArrow.addEventListener('click', () => {
+                nextSlide();
+                startInterval();
+            });
+
+            dots.forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    currentSlide = index;
+                    updateCarousel(currentSlide);
+                    startInterval();
+                });
+            });
+
+            (async () => {
+                teachersData = await fetchTeachers();
+                startInterval();
+                renderCalendar();
+            })();
         });
     </script>
+
 </body>
 </html>
