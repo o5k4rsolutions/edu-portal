@@ -1,1 +1,79 @@
-Strona wyłączona z użytkowania
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Błąd 404 - Nie znaleziono strony</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%231D4ED8' d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.9c-.6.6-1.4.95-2.17.95h-.05c-.8 0-1.55-.3-2.1-.8l-.9.9c.8.8 1.9 1.25 3.05 1.25H13v1h-2v-2h.05c.8 0 1.5-.35 2.05-.9l.9-.9c.5-.5.8-1.2.8-1.95 0-1.1-.9-2-2-2s-2 .9-2 2h-2c0-2.2 1.8-4 4-4s4 1.8 4 4c0 .7-.3 1.35-.8 1.85z'/%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Calibri', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            10% { transform: translateX(-5px) rotate(-1deg); }
+            20% { transform: translateX(5px) rotate(1deg); }
+            30% { transform: translateX(-5px) rotate(-1deg); }
+            40% { transform: translateX(5px) rotate(1deg); }
+            50% { transform: translateX(-5px) rotate(-1deg); }
+            60% { transform: translateX(5px) rotate(1deg); }
+            70% { transform: translateX(-5px) rotate(-1deg); }
+            80% { transform: translateX(5px) rotate(1deg); }
+            90% { transform: translateX(-5px) rotate(-1deg); }
+        }
+
+        .question-animation {
+            animation: shake 2s cubic-bezier(.36,.07,.19,.97) infinite;
+            transform-origin: center center;
+            display: inline-block;
+        }
+        
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+
+    <div class="text-center max-w-lg w-full bg-white p-8 md:p-12 rounded-2xl shadow-xl border border-gray-200">
+        
+        <div class="text-9xl mb-6 flex justify-center items-center text-blue-600">
+            <span class="question-animation font-black">?</span>
+        </div>
+
+        <p class="text-8xl font-extrabold text-gray-800 mb-4">
+            404
+        </p>
+
+        <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Gdzie jest ta strona?
+        </h1>
+
+        <p class="text-md text-gray-500 mb-8">
+            Przepraszamy, ale strona, której szukasz, nie została znaleziona. Wygląda na to, że zgubiła się w gąszczu internetu.
+        </p>
+
+        <div class="bg-blue-50 p-4 rounded-lg mb-8 border-l-4 border-blue-500 flex items-center justify-center">
+            
+            <svg class="spinner w-5 h-5 mr-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+
+            <p class="text-lg font-semibold text-gray-900">
+                Udostępniam analizę do O5K4R
+            </p>
+        </div>
+
+
+    </div>
+
+</body>
+</html>
